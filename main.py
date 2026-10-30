@@ -1,7 +1,6 @@
 import argparse
 import re
 import logging
-import os
 from typing import Optional
 
 
@@ -68,8 +67,13 @@ def replace_sensitive_data(file_path: str, regex_pattern: str, replacement_strin
         # Compile the regex pattern
         compiled_pattern = re.compile(regex_pattern)
 
-        # Replace sensitive data
-        modified_content = compiled_pattern.sub(replacement_string, file_content)
+        # Replace sensitive data. The replacement goes through a
+        # callable so it is inserted literally: as a plain string,
+        # re.sub treats it as a template and a replacement such as a
+        # Windows path crashes on its backslash escapes. The documented
+        # interface promises a replacement string, not a template, so
+        # backreference syntax in the replacement is not supported.
+        modified_content = compiled_pattern.sub(lambda _m: replacement_string, file_content)
 
     except re.error as e:
         logging.error(f"Invalid regular expression: {regex_pattern} - {e}")
