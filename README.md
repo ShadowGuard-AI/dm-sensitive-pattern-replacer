@@ -1,3 +1,5 @@
+![Banner](banner.png)
+
 # dm-sensitive-pattern-replacer
 Replaces sensitive data matching regular expressions within files with a specified replacement string. Takes a file path, regex pattern, and replacement string as input. - Focused on Tools designed to generate or mask sensitive data with realistic-looking but meaningless values
 
