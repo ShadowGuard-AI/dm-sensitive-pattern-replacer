@@ -73,7 +73,10 @@ def replace_sensitive_data(file_path: str, regex_pattern: str, replacement_strin
         # Windows path crashes on its backslash escapes. The documented
         # interface promises a replacement string, not a template, so
         # backreference syntax in the replacement is not supported.
-        modified_content = compiled_pattern.sub(lambda _m: replacement_string, file_content)
+        modified_content, substitution_count = compiled_pattern.subn(lambda _m: replacement_string, file_content)
+        if substitution_count == 0:
+            logging.error("No matches were found or replaced.")
+            raise ValueError("No matches were found or replaced.")
 
     except re.error as e:
         logging.error(f"Invalid regular expression: {regex_pattern} - {e}")

@@ -15,3 +15,5 @@ Replaces sensitive data matching regular expressions within files with a specifi
 
 ## License
 Copyright (c) ShadowStrikeHQ
+
+A run whose pattern matches nothing exits with an error, prints a plain no matches line, and writes no output file in separate output mode. In the default in place mode a no match run also exits with an error and leaves the input file unchanged.
