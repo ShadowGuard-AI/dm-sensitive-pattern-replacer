@@ -54,6 +54,11 @@ def replace_sensitive_data(file_path: str, regex_pattern: str, replacement_strin
         raise ValueError("Regex pattern cannot be empty.")
 
     try:
+        # The whole file is read as one string, so the pattern sees the
+        # entire content at once and the file has to fit in memory. No
+        # encoding is named on either open in this function, so the
+        # platform default decides, and a file written under a different
+        # default can come back changed in more than the replaced spans.
         with open(file_path, 'r') as file:
             file_content = file.read()
     except FileNotFoundError:
@@ -64,7 +69,9 @@ def replace_sensitive_data(file_path: str, regex_pattern: str, replacement_strin
         raise
 
     try:
-        # Compile the regex pattern
+        # No flags are passed, and that is a real limit: matching is case
+        # sensitive, and a dot in the pattern does not cross a newline, so
+        # a value split across two lines is invisible to this tool.
         compiled_pattern = re.compile(regex_pattern)
 
         # Replace sensitive data. The replacement goes through a
@@ -86,7 +93,12 @@ def replace_sensitive_data(file_path: str, regex_pattern: str, replacement_strin
         raise
 
 
-    # Determine the output file path
+    # With no output file named, this tool overwrites its input, the
+    # opposite default from most of my file tools, and it is the documented
+    # interface here rather than an accident. The write is not atomic:
+    # opening with "w" truncates the file first, so a crash mid write
+    # leaves a partial file where the original used to be. Anyone who
+    # needs the original kept passes -o, every time.
     output_path = output_file if output_file else file_path
 
     try:
